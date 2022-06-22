@@ -1,5 +1,6 @@
 import streamlit
 import pandas 
+import requests
 
 streamlit.title('Esto es un titulo')
 
@@ -24,5 +25,27 @@ fruits_selected = streamlit.multiselect("Pick some fruits:", list(my_fruit_list.
 #filtro a nivel de tabla
 fruits_to_show = my_fruit_list.loc[fruits_selected]
 
-#tabla filtrada con información nutricionak
+#tabla filtrada con información nutricional
 streamlit.dataframe(fruits_to_show )
+
+#consumir una API
+streamlit.header("Fruityvice Fruit Advice!")
+
+# text input para consultar sobre una fruta
+fruit_choice = streamlit.text_input('What fruit would you like information about?')
+
+#invocamos la funcion get para consultar una fruta
+back_from_function = get_fruityvice_data(fruit_choice)
+
+# mostramos el dato en formato tabla filtrado desde un text inut
+streamlit.dataframe(back_from_function)
+
+# Creacion de funcion
+def get_fruityvice_data(this_fruit_choice):
+    fruityvice_response = requests.get("https://fruityvice.com/api/fruit/" + this_fruit_choice)
+    # streamlit.text(fruityvice_response.json())
+
+    # Normalizamos el dato que nos entrega la api rest
+    fruityvice_normalized = pandas.json_normalize(fruityvice_response.json())
+    return fruityvice_normalized
+ 
